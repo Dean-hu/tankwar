@@ -1,0 +1,6 @@
+#tanks at initialization
+initTankCount =10
+
+#FireStrategy
+goodFS=FourDriFireStrategy
+badFS=DefaultFireStrategy

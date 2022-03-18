@@ -3,6 +3,7 @@
 import com.sun.org.apache.xpath.internal.functions.FuncFalse;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
 public class Tank {
@@ -15,12 +16,25 @@ public class Tank {
     Random random=new Random();
     private Group group=Group.BAD;
     private boolean  living =true;
-    int x=200,y=200;//坦克出生的位置
+
+    public boolean isLiving() {
+        return living;
+    }
+    //开火策略
+    Firestrategies f;
+    //坦克出生的位置
+    int x=200,y=200;
+    Rectangle rect=new Rectangle();
     public static int WIDTH=ResourceMgr.tankD.getWidth(),HEIGHT=ResourceMgr.tankD.getHeight();
     Direction dri=Direction.LEFT;
-    final static int speed=5;
+   final static int speed=5;
     private boolean moving=false;
     private tankFrame tankFrame;//持有主界面的引用
+
+    public tankFrame getTankFrame() {
+        return tankFrame;
+    }
+
     public void setMoving(boolean moving) {
         this.moving = moving;
     }
@@ -43,6 +57,29 @@ public class Tank {
         this.dri = dri;
         this.tankFrame=tankFrame;
         this.group=group;
+        rect.x=x;
+        rect.y=y;
+        rect.width=WIDTH;
+        rect.height=HEIGHT;
+//        if(group==Group.BAD)
+//           f=DefaultFireStrategy.getInstance();
+//        else
+//            f=FourDriFireStrategy.GetInstance();
+
+        if(group==Group.GOOD) {
+            String s = (String) PropertyMrg.props.get("goodFS");
+                try {
+                    f=(Firestrategies)Class.forName(s).getDeclaredMethod("getInstance").invoke(null,null);
+                } catch (Exception e) {
+                    e.printStackTrace();}
+        }
+        else {
+            String s = (String) PropertyMrg.props.get("goodFS");
+            try {
+                f=(Firestrategies)Class.forName(s).getDeclaredMethod("getInstance").invoke(null,null);
+            } catch (Exception e) {
+                e.printStackTrace();}
+        }
     }
 
     void paint(Graphics g) {
@@ -53,7 +90,6 @@ public class Tank {
             case UP:g.drawImage(ResourceMgr.tankU,x,y,null); break;
             case DOWN:g.drawImage(ResourceMgr.tankD,x,y,null); break;
         }
-
        move();
     }
 
@@ -71,17 +107,30 @@ public class Tank {
             default:
                 break;
         }
-        if(random.nextInt(10)>8) this.fire();
+        //update rect
+        rect.x=x;
+        rect.y=y;
+        if(x<2) x=2;
+        if(y<30) y=30;
+        if(x> tankFrame.Game_Width-WIDTH) x=tankFrame.Game_Width-WIDTH;
+        if(y> tankFrame.Game_Height-HEIGHT) y=tankFrame.Game_Height-HEIGHT;
+        if(this.group==Group.BAD &&random.nextInt(200)>195)
+               randomDri();
+        if(random.nextInt(10)>8&&this.group==Group.BAD) this.fire();
+    }
+
+    private void randomDri() {
+        this.dri=Direction.values()[random.nextInt(4)];
     }
 
     public void fire() {
-        int dx=x+Tank.WIDTH/2-bullet.WIDTH/2;
-        int dy=y+Tank.HEIGHT/2-bullet.HEIGHT/2;
-        tankFrame.bullets.add(new bullet(dx,dy,dri,tankFrame,this.group));
+       f.fire(this);
     }
 
     public void die() {
         living=false;
-        tankFrame.explodes.add(new Explode(x,y,tankFrame));
+        int ex=x+Tank.WIDTH/2-Explode.WIDTH/2;
+        int ey=y+Tank.HEIGHT/2-Explode.HEIGHT/2;
+        tankFrame.explodes.add(new Explode(ex,ey,tankFrame));
     }
 }

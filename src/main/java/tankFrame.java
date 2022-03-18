@@ -15,6 +15,7 @@ public class tankFrame extends  Frame {
     Explode explode=new Explode(100,100,this);
 
    public static  final  int Game_Width=800,Game_Height=800;
+   // 主战坦克
    Tank MyTank=new Tank(200,400,Direction.LEFT,this,Group.GOOD);
     public tankFrame(){
         setVisible(true);
@@ -28,21 +29,22 @@ public class tankFrame extends  Frame {
               System.exit(0);
           }});
        }
+
+
        Image offScreenImage =null;
 
-    public void update(Graphics g){
-        if(offScreenImage==null){
-            offScreenImage=this.createImage(Game_Width,Game_Height);
+    public void update(Graphics g) {
+        if (offScreenImage == null) {
+            offScreenImage = this.createImage(Game_Width, Game_Height);
         }
-        Graphics gOffScreen=offScreenImage.getGraphics();
-        Color c=gOffScreen.getColor();
+        Graphics gOffScreen = offScreenImage.getGraphics();
+        Color c = gOffScreen.getColor();
         gOffScreen.setColor(Color.BLACK);
-        gOffScreen.fillRect(0,0,Game_Width,Game_Height);//从frame的（0,0）位置重画一张黑色的图
+        gOffScreen.fillRect(0, 0, Game_Width, Game_Height);//从frame的（0,0）位置重画一张黑色的图
         gOffScreen.setColor(c);
         paint(gOffScreen);
-        g.drawImage(offScreenImage,0,0,null);
+        g.drawImage(offScreenImage, 0, 0, null);
     }
-
     @Override
     public void paint(Graphics g) {
 
@@ -51,14 +53,17 @@ public class tankFrame extends  Frame {
         g.drawString("子弹的数量为"+bullets.size(),10,60);
         g.drawString("敌人的数量为"+enemies.size(),10,80);
         g.setColor(c);
-        MyTank.paint(g);
+        if(MyTank.isLiving())
+            MyTank.paint(g);
        for(int i=0;i<bullets.size();i++)
            bullets.get(i).paint(g);
         for(int i=0;i<enemies.size();i++)
             enemies.get(i).paint(g);
         for(int i=0;i<explodes.size();i++)
             explodes.get(i).paint(g);
+        //判断是否相撞
         for(int i=0;i<bullets.size();i++){
+           if(MyTank.isLiving()) bullets.get(i).collideWith(MyTank);
             for(int j=0;j<enemies.size();j++){
                 bullets.get(i).collideWith(enemies.get(j));
             }

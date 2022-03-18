@@ -19,7 +19,7 @@ public class Explode {
         void paint(Graphics g) {
             g.drawImage(ResourceMgr.explodes[step++],x,y,null);
            if(step>=ResourceMgr.explodes.length)
-               tankFrame.explodes.remove(this);
+                 tankFrame.explodes.remove(this);
         }
 
 }

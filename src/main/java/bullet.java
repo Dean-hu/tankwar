@@ -7,6 +7,7 @@ public class bullet {
     private boolean living =true;
     private tankFrame tankFrame;
     private Group group=Group.BAD;
+    Rectangle rect=new Rectangle();//优化部分，这样一个子弹只对应一个rect，而不会new出来很多rect，节省内存
     public   static  final  int WIDTH=ResourceMgr.bulletL.getWidth(),HEIGHT=ResourceMgr.bulletL.getHeight();
     public bullet(int x, int y, Direction dri,tankFrame tankFrame,Group group) {
         this.x = x;
@@ -14,6 +15,11 @@ public class bullet {
         this.dri = dri;
         this.tankFrame=tankFrame;
         this.group=group;
+        rect.x=x;
+        rect.y=y;
+        rect.width=WIDTH;
+        rect.height=HEIGHT;
+        tankFrame.bullets.add(this);
     }
 
     public void paint(Graphics g){
@@ -36,15 +42,16 @@ public class bullet {
             default:
                 break;
         }
+        //update rect
+        rect.x=x;
+        rect.y=y;
         if(x<0||y<0||x>tankFrame.Game_Width||y>tankFrame.Game_Height)
             living =false;
     }
 
     public void collideWith(Tank tank) {
         if(this.group==tank.getGroup())  return;
-        Rectangle rec1=new Rectangle(this.x,this.y,WIDTH,HEIGHT);
-        Rectangle rec2=new Rectangle(tank.getX(),tank.getY(),Tank.WIDTH,Tank.HEIGHT);
-        if(rec1.intersects(rec2)) {
+        if(rect.intersects(tank.rect)) {
             living = false;
             tank.die();
         }
