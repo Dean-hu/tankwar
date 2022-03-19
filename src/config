@@ -1,5 +1,5 @@
 #tanks at initialization
-initTankCount =10
+initTankCount =100
 
 #FireStrategy
 goodFS=FourDriFireStrategy

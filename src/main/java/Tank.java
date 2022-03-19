@@ -23,7 +23,7 @@ public class Tank {
     //开火策略
     Firestrategies f;
     //坦克出生的位置
-    int x=200,y=200;
+    int x=500,y=500;
     Rectangle rect=new Rectangle();
     public static int WIDTH=ResourceMgr.tankD.getWidth(),HEIGHT=ResourceMgr.tankD.getHeight();
     Direction dri=Direction.LEFT;
@@ -74,7 +74,7 @@ public class Tank {
                     e.printStackTrace();}
         }
         else {
-            String s = (String) PropertyMrg.props.get("goodFS");
+            String s = (String) PropertyMrg.props.get("badFS");
             try {
                 f=(Firestrategies)Class.forName(s).getDeclaredMethod("getInstance").invoke(null,null);
             } catch (Exception e) {
@@ -124,7 +124,8 @@ public class Tank {
     }
 
     public void fire() {
-       f.fire(this);
+       if(isLiving())
+           f.fire(this);
     }
 
     public void die() {
