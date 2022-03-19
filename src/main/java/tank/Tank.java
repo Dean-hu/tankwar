@@ -1,9 +1,10 @@
+package tank;
 
-
-import com.sun.org.apache.xpath.internal.functions.FuncFalse;
+import M.GameModel;
+import tools.ImageUtil;
 
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
+import java.awt.image.BufferedImage;
 import java.util.Random;
 
 public class Tank {
@@ -25,15 +26,13 @@ public class Tank {
     //坦克出生的位置
     int x=500,y=500;
     Rectangle rect=new Rectangle();
-    public static int WIDTH=ResourceMgr.tankD.getWidth(),HEIGHT=ResourceMgr.tankD.getHeight();
+    public static int WIDTH=ResourceMgr.goodTank1.getWidth(),HEIGHT=ResourceMgr.goodTank1.getHeight();
     Direction dri=Direction.LEFT;
    final static int speed=5;
     private boolean moving=false;
-    private tankFrame tankFrame;//持有主界面的引用
+    private GameModel gm;
 
-    public tankFrame getTankFrame() {
-        return tankFrame;
-    }
+
 
     public void setMoving(boolean moving) {
         this.moving = moving;
@@ -51,21 +50,20 @@ public class Tank {
         return dri;
     }
 
-    public Tank(int x, int y, Direction dri,tankFrame tankFrame,Group group) {
+    public Tank(int x, int y, Direction dri, GameModel gm, Group group) {
         this.x = x;
         this.y = y;
         this.dri = dri;
-        this.tankFrame=tankFrame;
+        this.gm=gm;
         this.group=group;
         rect.x=x;
         rect.y=y;
         rect.width=WIDTH;
         rect.height=HEIGHT;
-//        if(group==Group.BAD)
-//           f=DefaultFireStrategy.getInstance();
+//        if(group==tank.Group.BAD)
+//           f=tank.DefaultFireStrategy.getInstance();
 //        else
-//            f=FourDriFireStrategy.GetInstance();
-
+//            f=tank.FourDriFireStrategy.GetInstance();
         if(group==Group.GOOD) {
             String s = (String) PropertyMrg.props.get("goodFS");
                 try {
@@ -82,13 +80,40 @@ public class Tank {
         }
     }
 
-    void paint(Graphics g) {
-        if(!living) tankFrame.enemies.remove(this);
+    public GameModel getGm() {
+        return gm;
+    }
+    BufferedImage t;
+    boolean s=true;
+    int step=0;
+    public void paint(Graphics g) {
+        if(!isLiving()) gm.enemies.remove(this);
+        if(step<10)
+        {
+            if(group==Group.GOOD)
+              t=ResourceMgr.goodTank1;
+            else
+                t=ResourceMgr.badTank1;
+        }
+        else if(step>20) step=0;
+        else
+        {
+            if(group==Group.GOOD)
+                t=ResourceMgr.goodTank2;
+            else
+                t=ResourceMgr.badTank2;
+        }
+            step++;
         switch (dri){
-            case LEFT:g.drawImage(ResourceMgr.tankL,x,y,null); break;
-            case RIGHT:g.drawImage(ResourceMgr.tankR,x,y,null); break;
-            case UP:g.drawImage(ResourceMgr.tankU,x,y,null); break;
-            case DOWN:g.drawImage(ResourceMgr.tankD,x,y,null); break;
+            case LEFT:g.drawImage(ImageUtil.rotateImage(t,270),x,y,null); break;
+            case RIGHT:g.drawImage(ImageUtil.rotateImage(t,90),x,y,null); break;
+            case UP:g.drawImage(t,x,y,null); break;
+            case DOWN: g.drawImage(ImageUtil.rotateImage(t,180),x,y,null); break;
+            case LU:g.drawImage(ImageUtil.rotateImage(t,315),x,y,null); break;
+            case RU:g.drawImage(ImageUtil.rotateImage(t,45),x,y,null); break;
+            case LD:g.drawImage(ImageUtil.rotateImage(t,225),x,y,null); break;
+            case RD:g.drawImage(ImageUtil.rotateImage(t,135),x,y,null); break;
+
         }
        move();
     }
@@ -99,11 +124,17 @@ public class Tank {
 
     private void move() {
         if(!moving)  return;
+        if(group==Group.GOOD)
+        new Thread(()->new Audio("audio/tank_move.wav").play()).start();
         switch (dri){
             case LEFT : {x-=speed;break;}
             case RIGHT:  {x+=speed;break;}
             case UP: {y-=speed;break;}
             case DOWN:  {y+=speed;break;}
+            case LD:  {x-=speed;y+=speed;break;}
+            case LU : {x-=speed;y-=speed;break;}
+            case RU:  {x+=speed;y-=speed;break;}
+            case RD: {x+=speed;y+=speed;break;}
             default:
                 break;
         }
@@ -120,7 +151,7 @@ public class Tank {
     }
 
     private void randomDri() {
-        this.dri=Direction.values()[random.nextInt(4)];
+        this.dri=Direction.values()[random.nextInt(8)];
     }
 
     public void fire() {
@@ -132,6 +163,6 @@ public class Tank {
         living=false;
         int ex=x+Tank.WIDTH/2-Explode.WIDTH/2;
         int ey=y+Tank.HEIGHT/2-Explode.HEIGHT/2;
-        tankFrame.explodes.add(new Explode(ex,ey,tankFrame));
+        gm.explodes.add(new Explode(ex,ey,gm));
     }
 }

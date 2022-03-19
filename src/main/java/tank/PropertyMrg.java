@@ -1,9 +1,11 @@
+package tank;
+
 import java.io.IOException;
 import java.util.Properties;
 //读取配置文件
 public class PropertyMrg {
 
-    static Properties props=new Properties();
+    public static Properties props=new Properties();
     static {
         try {
             props.load(PropertyMrg.class.getClassLoader().getResourceAsStream("config"));

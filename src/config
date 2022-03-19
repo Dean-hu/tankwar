@@ -1,6 +1,6 @@
 #tanks at initialization
-initTankCount =100
+initTankCount =20
 
 #FireStrategy
-goodFS=FourDriFireStrategy
-badFS=DefaultFireStrategy
+goodFS=tank.FourDriFireStrategy
+badFS=tank.DefaultFireStrategy
