@@ -17,7 +17,7 @@ public class FourDriFireStrategy implements Firestrategies{
         {
             if(tank.getGroup()==Group.GOOD)
             new Thread(()->new Audio("audio/explode.wav").play()).start();
-            new bullet(dx,dy,dir,tank.getGm(),tank.getGroup());
+            new bullet(dx,dy,dir,tank.getGroup());
         }
     }
 }

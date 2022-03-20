@@ -1,33 +1,32 @@
 package tank;
 
 import M.GameModel;
+import M.GameObject;
 
 import java.awt.*;
 
-public class bullet {
-    private int speed=10;
+public class bullet extends GameObject {
+    private int speed=20;
     private  int x,y;
     private Direction dri;
     private boolean living =true;
-   private GameModel gm;
     private Group group=Group.BAD;
-    Rectangle rect=new Rectangle();//优化部分，这样一个子弹只对应一个rect，而不会new出来很多rect，节省内存
+    public  Rectangle rect=new Rectangle();//优化部分，这样一个子弹只对应一个rect，而不会new出来很多rect，节省内存
     public   static  final  int WIDTH=ResourceMgr.bulletL.getWidth(),HEIGHT=ResourceMgr.bulletL.getHeight();
-    public bullet(int x, int y, Direction dri,GameModel gm,Group group) {
+    public bullet(int x, int y, Direction dri,Group group) {
         this.x = x;
         this.y = y;
         this.dri = dri;
-        this.gm=gm;
         this.group=group;
         rect.x=x;
         rect.y=y;
         rect.width=WIDTH;
         rect.height=HEIGHT;
-       gm.bullets.add(this);
+       GameModel.getInstance().objects.add(this);
     }
 
     public void paint(Graphics g){
-        if(!living) gm.bullets.remove(this);
+        if(!living) GameModel.getInstance().objects.remove(this);
        switch (dri){
            case LEFT:g.drawImage(ResourceMgr.bulletL,x,y,null);break;
            case RIGHT:g.drawImage(ResourceMgr.bulletR,x,y,null);break;
@@ -39,6 +38,16 @@ public class bullet {
            case RD:g.drawImage(ResourceMgr.bulletRD,x,y,null);break;
        }
         move();
+    }
+
+    @Override
+    public int getWidth() {
+        return WIDTH;
+    }
+
+    @Override
+    public int getHeight() {
+        return HEIGHT;
     }
 
     private void move() {
@@ -61,11 +70,8 @@ public class bullet {
             living =false;
     }
 
-    public void collideWith(Tank tank) {
-        if(this.group==tank.getGroup())  return;
-        if(rect.intersects(tank.rect)) {
-            living = false;
-            tank.die();
-        }
+    public Group getGroup() {
+        return group;
     }
+
 }

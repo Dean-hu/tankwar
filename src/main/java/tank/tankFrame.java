@@ -42,10 +42,13 @@ public class tankFrame extends  Frame {
         paint(gOffScreen);
         g.drawImage(offScreenImage, 0, 0, null);
     }
+
     @Override
     public void paint(Graphics g) {
          gm.paint(g);
     }
+
+
     boolean BL=false;
     boolean BR=false;
     boolean BU=false;
