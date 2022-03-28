@@ -2,13 +2,28 @@ package tank;
 
 import M.GameModel;
 import M.GameObject;
+import Server.TankJoinMsg;
 import tools.ImageUtil;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
+import java.util.UUID;
 
 public class Tank extends GameObject {
+    public Tank(TankJoinMsg tankJoinMsg) {
+        this.x=tankJoinMsg.x;
+        this.y=tankJoinMsg.y;
+        this.dri=tankJoinMsg.dir;
+        this.group=tankJoinMsg.group;
+        this.id=tankJoinMsg.id;
+        this.moving=tankJoinMsg.moving;
+        rect.x=this.x;
+        rect.y=this.y;
+        rect.width=WIDTH;
+        rect.height=HEIGHT;
+    }
+
     public int getX() {
         return x;
     }
@@ -16,6 +31,7 @@ public class Tank extends GameObject {
         return y;
     }
     Random random=new Random();
+    public UUID id=UUID.randomUUID();
     private Group group=Group.BAD;
     private boolean  living =true;
     public int OldX,OldY;
@@ -33,7 +49,7 @@ public class Tank extends GameObject {
     public Rectangle rect=new Rectangle();
     public static int WIDTH=ResourceMgr.goodTank1.getWidth(),HEIGHT=ResourceMgr.goodTank1.getHeight();
     Direction dri=Direction.LEFT;
-   final static int speed=5;
+    final static int speed=5;
     private boolean moving=false;
 
     public void setMoving(boolean moving) {
@@ -52,7 +68,7 @@ public class Tank extends GameObject {
         return dri;
     }
 
-    public Tank(int x, int y, Direction dri, GameModel gm, Group group) {
+    public Tank(int x, int y, Direction dri, Group group) {
         this.x = x;
         this.y = y;
         this.dri = dri;
@@ -75,14 +91,21 @@ public class Tank extends GameObject {
             } catch (Exception e) {
                 e.printStackTrace();}
         }
-        GameModel.getInstance().objects.add(this);
+        GameModel.getInstance().objects.put(id,this);
     }
 
     BufferedImage t;
     boolean s=true;
     int step=0;
     public void paint(Graphics g) {
-        if(!isLiving()) GameModel.getInstance().objects.remove(this);
+        //uuid on head
+        Color c = g.getColor();
+        g.setColor(Color.YELLOW);
+        g.drawString(id.toString(), this.x, this.y - 20);
+        g.drawString("live=" + living, x, y-10);
+        g.setColor(c);
+
+        if(!isLiving()) GameModel.getInstance().objects.remove(id);
         if(step<10)
         {
             if(group==Group.GOOD)
@@ -178,6 +201,7 @@ public class Tank extends GameObject {
         living=false;
         int ex=x+Tank.WIDTH/2-Explode.WIDTH/2;
         int ey=y+Tank.HEIGHT/2-Explode.HEIGHT/2;
-       GameModel.getInstance().objects.add(new Explode(ex,ey));
+        Explode e=new Explode(ex,ey);
+       GameModel.getInstance().objects.put(e.id,e);
     }
 }

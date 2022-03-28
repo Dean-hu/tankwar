@@ -1,32 +1,40 @@
 package tank;
 
+import Client.Client;
 import M.GameModel;
 import M.GameObject;
+import Server.BulletNewMsg;
+import com.sun.media.jfxmedia.events.PlayerEvent;
 
 import java.awt.*;
+import java.util.UUID;
 
 public class bullet extends GameObject {
     private int speed=20;
-    private  int x,y;
-    private Direction dri;
+    public   int x,y;
+    public Direction dri;
     private boolean living =true;
     private Group group=Group.BAD;
+    public UUID id=UUID.randomUUID();
+    public UUID playerId=null;
     public  Rectangle rect=new Rectangle();//优化部分，这样一个子弹只对应一个rect，而不会new出来很多rect，节省内存
     public   static  final  int WIDTH=ResourceMgr.bulletL.getWidth(),HEIGHT=ResourceMgr.bulletL.getHeight();
-    public bullet(int x, int y, Direction dri,Group group) {
+    public bullet(int x, int y, Direction dri,Group group,UUID p) {
         this.x = x;
         this.y = y;
         this.dri = dri;
         this.group=group;
+        playerId=p;
         rect.x=x;
         rect.y=y;
         rect.width=WIDTH;
         rect.height=HEIGHT;
-       GameModel.getInstance().objects.add(this);
+       GameModel.getInstance().objects.put(id,this);
+
     }
 
     public void paint(Graphics g){
-        if(!living) GameModel.getInstance().objects.remove(this);
+        if(!living) GameModel.getInstance().objects.remove(this.id);
        switch (dri){
            case LEFT:g.drawImage(ResourceMgr.bulletL,x,y,null);break;
            case RIGHT:g.drawImage(ResourceMgr.bulletR,x,y,null);break;
@@ -67,7 +75,7 @@ public class bullet extends GameObject {
         rect.x=x;
         rect.y=y;
         if(x<0||y<0||x>tankFrame.Game_Width||y>tankFrame.Game_Height)
-            living =false;
+               living =false;
     }
 
     public Group getGroup() {

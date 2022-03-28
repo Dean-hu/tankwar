@@ -4,6 +4,7 @@ import M.GameModel;
 import M.GameObject;
 
 import java.awt.*;
+import java.util.UUID;
 
 public class Explode extends GameObject {
 
@@ -12,6 +13,7 @@ public class Explode extends GameObject {
 
         private  int x ,y;
         private int step=0;
+        public UUID id=UUID.randomUUID();
         public Explode(int x, int y) {
             this.x = x;
             this.y = y;
@@ -21,7 +23,7 @@ public class Explode extends GameObject {
         public void paint(Graphics g) {
             g.drawImage(ResourceMgr.explodes[step++],x,y,null);
            if(step>=ResourceMgr.explodes.length)
-                 GameModel.getInstance().objects.remove(this);
+                 GameModel.getInstance().objects.remove(id);
         }
 
     @Override

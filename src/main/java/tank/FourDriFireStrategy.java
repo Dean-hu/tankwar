@@ -1,5 +1,8 @@
 package tank;
 
+import Client.Client;
+import Server.BulletNewMsg;
+
 public class FourDriFireStrategy implements Firestrategies{
     private  static  FourDriFireStrategy Instance=new FourDriFireStrategy();
     private     FourDriFireStrategy(){}
@@ -17,7 +20,8 @@ public class FourDriFireStrategy implements Firestrategies{
         {
             if(tank.getGroup()==Group.GOOD)
             new Thread(()->new Audio("audio/explode.wav").play()).start();
-            new bullet(dx,dy,dir,tank.getGroup());
+            bullet a =new bullet(dx,dy,dir,tank.getGroup(),tank.id);
+            Client.INSTANCE.send(new BulletNewMsg(a));
         }
     }
 }

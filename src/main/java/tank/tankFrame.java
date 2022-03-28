@@ -1,6 +1,10 @@
 package tank;
 
+import Client.Client;
 import M.GameModel;
+import Server.TankDirChangedMsg;
+import Server.TankStartMovingMsg;
+import Server.TankStopMsg;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -10,7 +14,7 @@ import java.awt.event.WindowEvent;
 
 public class tankFrame extends  Frame {
 
-    GameModel gm=GameModel.getInstance();
+
    public static  final  int Game_Width=1000,Game_Height=1000;
    // 主战坦克
 
@@ -45,9 +49,8 @@ public class tankFrame extends  Frame {
 
     @Override
     public void paint(Graphics g) {
-         gm.paint(g);
+        GameModel.getInstance().paint(g);
     }
-
 
     boolean BL=false;
     boolean BR=false;
@@ -68,7 +71,7 @@ public class tankFrame extends  Frame {
           setMainTankDri();
         }
 
-       Tank MyTank=gm.MyTank;
+       Tank MyTank=GameModel.getInstance().MyTank;
         @Override
         public void keyReleased(KeyEvent e) {
             int key=e.getKeyCode();
@@ -87,9 +90,11 @@ public class tankFrame extends  Frame {
         private void setMainTankDri() {
             if(!BL&&!BR&&!BU&&!BD)
             {
-                MyTank.setMoving(false);}
+                Client.INSTANCE.send(new TankStopMsg(MyTank));
+                MyTank.setMoving(false);
+            }
             else {
-                MyTank.setMoving(true);
+                Direction d=MyTank.getDri();
                 if (BL) MyTank.setDri(Direction.LEFT);
                 if (BR) MyTank.setDri(Direction.RIGHT);
                 if (BU) MyTank.setDri(Direction.UP);
@@ -99,6 +104,13 @@ public class tankFrame extends  Frame {
                 if(BU&&BL) MyTank.setDri(Direction.LU);
                 if(BD&&BR) MyTank.setDri(Direction.RD);
                 if(BU&&BR) MyTank.setDri(Direction.RU);
+                if(!MyTank.isMoving())
+                    Client.INSTANCE.send(new TankStartMovingMsg(MyTank));
+                MyTank.setMoving(true);
+
+                if(d != MyTank.getDri()) {
+                    Client.INSTANCE.send(new TankDirChangedMsg(MyTank));
+                }
             }
         }
     }//只给tankFrame用，所以写在内部
