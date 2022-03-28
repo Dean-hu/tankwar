@@ -37,8 +37,6 @@ public class GameModel {
             t.paint(g);
         }
 
-           for(GameObject a :objects.values())
-
     }
 
     public Tank findTankByUUID(UUID id) {

@@ -66,6 +66,7 @@ public class TankStartMovingMsg extends Msg {
 
 		if (t != null) {
 			t.setMoving(true);
+			t.move();
 			t.setX(this.x);
 			t.setY(this.y);
 			t.setDri(dir);

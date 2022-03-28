@@ -12,6 +12,7 @@ import java.util.UUID;
 
 public class Tank extends GameObject {
     public Tank(TankJoinMsg tankJoinMsg) {
+        super();
         this.x=tankJoinMsg.x;
         this.y=tankJoinMsg.y;
         this.dri=tankJoinMsg.dir;
@@ -158,7 +159,7 @@ public class Tank extends GameObject {
         this.y = y;
     }
 
-    private void move() {
+    public void move() {
         if(!moving)  return;
         if(group==Group.GOOD)
         new Thread(()->new Audio("audio/tank_move.wav").play()).start();
